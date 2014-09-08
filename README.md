@@ -10,6 +10,10 @@ Deploy 5 instances of the canary app to your Runtime/Diego cluster:
 
 ```
 # e.g. app_name=diego-canary-app DATADOG_API_KEY=1234notgonnatellyou DEPLOYMENT_NAME=ketchup
+cf api api.$DEPLOYMENT_NAME.cf-app.com
+cf login
+# ...
+# find or create org/space named 'canaries'/'canaries', and target
 cf push $app_name --no-start
 cf set-env $app_name CF_DIEGO_BETA true
 cf set-env $app_name CF_DIEGO_RUN_BETA true
