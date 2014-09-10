@@ -65,6 +65,7 @@ func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
 			println(err.Error())
 			continue
 		}
+		resp.Body.Close()
 		println(resp.Status)
 	}
 }
