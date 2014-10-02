@@ -23,13 +23,15 @@ cf start $app_name
 cf scale $app_name -i 20
 ```
 
-Create a graph in Datadog to track that 5 instances are up and running:
+Datadog
+=======
 
-1. Use a time-series graph.
-2. The metric should **sum** over `diego.canary.app.instance`, filtering by the tag `deployment:$DEPLOYMENT_NAME`.
-3. (Optional) Add the appropriate metric to your dashboard configuration in the `datadog-config` repo and run the rake task to push the changes to your timeboard.
+The `datadog-config` repo has config for a diego board that has a graph for number of instances that are up.
+
+Pingdom
+=======
 
 Set up up/down monitoring and email alerting via Pingdom:
 
 1. Log in to Pingdom using the Diego account in LastPass.
-2. Add an up/down alert with the URL `http://$app_name.$DEPLOYMENT_NAME.cf-app.com`
+2. Add an up/down alert with the URL `http://$app_name.<app-domain-for-your-cf-deployment>`
