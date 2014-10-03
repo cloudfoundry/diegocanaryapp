@@ -33,5 +33,5 @@ Pingdom
 
 Set up up/down monitoring and email alerting via Pingdom:
 
-1. Log in to Pingdom using the Diego account in LastPass.
-2. Add an up/down alert with the URL `http://$app_name.<app-domain-for-your-cf-deployment>`
+1. Log in to Pingdom using the master account in LastPass.
+2. Add an uptime check for the URL of the canary app, and choose the "Diego Team" alert policy.
