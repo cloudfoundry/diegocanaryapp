@@ -15,7 +15,7 @@ cf login
 # ...
 # find or create org/space named 'canaries'/'canaries', and target
 cf push $app_name --no-start
-cf set-env $app_name DIEGO_BETA true
+cf set-env $app_name DIEGO_STAGE_BETA true
 cf set-env $app_name DIEGO_RUN_BETA true
 cf set-env $app_name DATADOG_API_KEY $DATADOG_API_KEY
 cf set-env $app_name DEPLOYMENT_NAME $DEPLOYMENT_NAME
