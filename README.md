@@ -9,8 +9,8 @@ Usage
 Deploy 20 instances of the canary app to your Runtime/Diego cluster:
 
 ```
-# e.g. app_name=diego-canary-app DATADOG_API_KEY=1234notgonnatellyou DEPLOYMENT_NAME=ketchup
-cf api api.$DEPLOYMENT_NAME.cf-app.com
+# e.g. app_name=diego-canary-app DATADOG_API_KEY=1234notgonnatellyou DEPLOYMENT_NAME=cf-ketchup
+cf api api.ketchup.cf-app.com
 cf login
 # ...
 # find or create org/space named 'canaries'/'canaries', and target
