@@ -53,7 +53,6 @@ func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
 			deploymentName,
 			appIndex,
 		))
-		println(jsonString)
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonString))
 		if err != nil {
 			println(err.Error())
@@ -66,7 +65,8 @@ func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
 			continue
 		}
 		resp.Body.Close()
-		println(resp.Status)
+
+		println("datadog: " + resp.Status)
 	}
 }
 
