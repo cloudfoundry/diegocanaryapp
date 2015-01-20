@@ -46,7 +46,7 @@ func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
 			`[{`+
 			`"metric":"diego.canary.app.instance",`+
 			`"points":[[%d, 1]],`+
-			`"tags":["deployment:%s", "diego-canary-app-%d"]`+
+			`"tags":["deployment:%s", "diego-canary-app:%d"]`+
 			`}]`+
 			`}`,
 			time.Now().Unix(),
