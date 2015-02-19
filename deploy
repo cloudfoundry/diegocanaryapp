@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -e -x -u
+
+
+## Environment
+# - Target a CF org and space as a SpaceDeveloper
+
+## Variables
+# Required:
+# - DATADOG_API_KEY
+# - DEPLOYMENT_NAME
+
+# Optional:
+# - APP_NAME (default: diego-canary-app)
+# - INSTANCE_COUNT (default: 20)
+# - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
+
+
+if [[ -z $DATADOG_API_KEY ]]; then
+  echo "Please set the DATADOG_API_KEY environment variable."
+  exit 1
+fi
+
+if [[ -z $DEPLOYMENT_NAME ]]; then
+  echo "Please set the DEPLOYMENT_NAME environment variable."
+  exit 1
+fi
+
+cf=${CF_COMMAND:-cf}
+app_name=${APP_NAME:-diego-canary-app}
+instance_count=${INSTANCE_COUNT:-20}
+
+$cf push $app_name --no-start -m 32M -k 32M
+app_guid=$($cf app "${app_name}" --guid | tr -d '\n')
+$cf curl /v2/apps/${app_guid} -X PUT -d '{"diego": true}'
+$cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
+$cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
+$cf start $app_name
+$cf scale $app_name -i $instance_count
