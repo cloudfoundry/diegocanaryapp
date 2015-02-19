@@ -1,1 +1,1 @@
-web: go-online
+web: diego-canary-app
