@@ -10,13 +10,13 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", hello)
-	fmt.Println("listening and heartbeating ...")
-
 	appIndex, err := extractAppIndex(os.Getenv("VCAP_APPLICATION"))
 	if err != nil {
 		panic(err.Error())
 	}
+
+	http.Handle("/", helloFromInstance(appIndex))
+
 	datadogApiKey := os.Getenv("DATADOG_API_KEY")
 	deploymentName := os.Getenv("DEPLOYMENT_NAME")
 	go postHeartbeat(appIndex, datadogApiKey, deploymentName)
@@ -25,10 +25,17 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	fmt.Println("listening and heartbeating...")
 }
 
-func hello(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "go, world")
+func helloFromInstance(index int) http.Handler {
+	instanceText := fmt.Sprintf("Diego canary app: tweet tweet from instance %d", index)
+	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		res.Header().Add("Content-type", "text/plain")
+		fmt.Fprintln(res, instanceText)
+		fmt.Fprintln(res, "For more information about this app, please consult http://github.com/cloudfoundry-incubator/diegocanaryapp.")
+	})
 }
 
 func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
