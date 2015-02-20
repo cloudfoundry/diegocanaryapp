@@ -14,15 +14,16 @@ set -e -x -u
 # Optional:
 # - APP_NAME (default: diego-canary-app)
 # - INSTANCE_COUNT (default: 20)
+# - DOMAIN (defaults to the default domain for the targeted space)
 # - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
 
 
-if [[ -z $DATADOG_API_KEY ]]; then
+if [[ -z "${DATADOG_API_KEY}" ]]; then
   echo "Please set the DATADOG_API_KEY environment variable."
   exit 1
 fi
 
-if [[ -z $DEPLOYMENT_NAME ]]; then
+if [[ -z "${DEPLOYMENT_NAME}" ]]; then
   echo "Please set the DEPLOYMENT_NAME environment variable."
   exit 1
 fi
@@ -30,8 +31,14 @@ fi
 cf=${CF_COMMAND:-cf}
 app_name=${APP_NAME:-diego-canary-app}
 instance_count=${INSTANCE_COUNT:-20}
+domain_name=${DOMAIN:-}
+if [[ -n "${domain_name}" ]]; then
+  domain_argument="-d ${domain_name}"
+else
+  domain_argument=""
+fi
 
-$cf push $app_name --no-start -m 32M -k 32M
+$cf push $app_name --no-start -m 32M -k 32M ${domain_argument}
 app_guid=$($cf app "${app_name}" --guid | tr -d '\n')
 $cf curl /v2/apps/${app_guid} -X PUT -d '{"diego": true}'
 $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
