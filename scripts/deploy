@@ -28,6 +28,8 @@ if [[ -z "${DEPLOYMENT_NAME}" ]]; then
   exit 1
 fi
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 cf=${CF_COMMAND:-cf}
 app_name=${APP_NAME:-diego-canary-app}
 instance_count=${INSTANCE_COUNT:-20}
@@ -38,10 +40,12 @@ else
   domain_argument=""
 fi
 
-$cf push $app_name --no-start -m 32M -k 32M ${domain_argument}
-app_guid=$($cf app "${app_name}" --guid | tr -d '\n')
-$cf curl /v2/apps/${app_guid} -X PUT -d '{"diego": true}'
-$cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
-$cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
-$cf start $app_name
-$cf scale $app_name -i $instance_count
+pushd "$DIR/.."
+  $cf push $app_name --no-start -m 32M -k 32M ${domain_argument}
+  app_guid=$($cf app "${app_name}" --guid | tr -d '\n')
+  $cf curl /v2/apps/${app_guid} -X PUT -d '{"diego": true}'
+  $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
+  $cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
+  $cf start $app_name
+  $cf scale $app_name -i $instance_count
+popd

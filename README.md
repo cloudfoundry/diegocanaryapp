@@ -12,7 +12,7 @@ Deploy instances of the canary app to your Runtime/Diego cluster:
 # target the CF org and space intended for the app
 export DATADOG_API_KEY='your-api-key'
 export DEPLOYMENT_NAME='cf-your-deployment-diego'
-./deploy
+./scripts/deploy
 ```
 
 - The app name defaults to `diego-canary-app`, and can be overridden with the `APP_NAME` environment variable.
