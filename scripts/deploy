@@ -43,7 +43,7 @@ else
 fi
 
 pushd "$DIR/.."
-  $cf push $app_name --no-start -m 32M -k 32M ${domain_argument} -s ${cf_stack}
+  $cf push $app_name --no-start -m 32M -k 32M ${domain_argument} -s ${cf_stack} -b go_buildpack
   app_guid=$($cf app "${app_name}" --guid | tr -d '\n')
   $cf curl /v2/apps/${app_guid} -X PUT -d '{"diego": true}'
   $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
