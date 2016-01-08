@@ -29,7 +29,7 @@ if [[ -z "${DEPLOYMENT_NAME}" ]]; then
   exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cf=${CF_COMMAND:-cf}
 app_name=${APP_NAME:-diego-canary-app}
