@@ -1,4 +1,4 @@
-package main
+package diegocanaryapp
 
 import (
 	"bytes"
@@ -34,7 +34,7 @@ func helloFromInstance(index int) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		res.Header().Add("Content-type", "text/plain")
 		fmt.Fprintln(res, instanceText)
-		fmt.Fprintln(res, "For more information about this app, please consult http://github.com/cloudfoundry-incubator/diegocanaryapp.")
+		fmt.Fprintln(res, "For more information about this app, please consult http://code.cloudfoundry.org/diegocanaryapp.")
 	})
 }
 
