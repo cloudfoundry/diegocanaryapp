@@ -1,6 +1,8 @@
 diegocanaryapp
 ==============
 
+**Note**: This repository should be imported as `code.cloudfoundry.org/diegocanaryapp`.
+
 Simple canary app to test long-running Diego deployments
 
 Usage
