@@ -1,4 +1,4 @@
-package diegocanaryapp
+package main
 
 import (
 	"bytes"
