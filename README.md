@@ -21,6 +21,7 @@ export DEPLOYMENT_NAME='cf-your-deployment-diego'
 - The instance count defaults to 20, and can be overridden with the `INSTANCE_COUNT` environment variable.
 - The domain defaults to the default domain for the targeted space, and can be overriden with the `DOMAIN` environment variable.
 - For a dry run, set the `CF_COMMAND` environment variable to `'echo cf'`.
+- If using a syslog forwarding service (to Papertrail, for example), specify the name of the service to bind to the app as `SERVICE_TO_BIND`.
 
 Datadog
 =======

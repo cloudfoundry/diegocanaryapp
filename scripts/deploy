@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e -x -u
+set -e -x
 
 
 ## Environment
@@ -17,6 +17,7 @@ set -e -x -u
 # - DOMAIN (defaults to the default domain for the targeted space)
 # - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
 # - CF_STACK (default: cflinuxfs2)
+# - SERVICE_TO_BIND (no default; if specified, binds the given service before cf start)
 
 
 if [[ -z "${DATADOG_API_KEY}" ]]; then
@@ -48,6 +49,9 @@ pushd "$DIR/.."
   $cf curl /v2/apps/${app_guid} -X PUT -d '{"diego": true}'
   $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
   $cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
+  if [[ -n "${SERVICE_TO_BIND}" ]]; then
+    $cf bind-service $app_name ${SERVICE_TO_BIND}
+  fi
   $cf start $app_name
   $cf scale $app_name -i $instance_count
 popd
