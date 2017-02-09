@@ -1,1 +1,1 @@
-web: diego-canary-app
+web: diegocanaryapp
