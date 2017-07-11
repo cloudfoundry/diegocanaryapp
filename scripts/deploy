@@ -18,7 +18,7 @@ set -e -x
 # - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
 # - CF_STACK (default: cflinuxfs2)
 # - SERVICE_TO_BIND (no default; if specified, binds the given service before cf start)
-
+# - USE_DECLARATIVE_HEALTHCHECK (default "false"; if set to true, sets the http health check)
 
 if [[ -z "${DATADOG_API_KEY}" ]]; then
   echo "Please set the DATADOG_API_KEY environment variable."
@@ -43,6 +43,8 @@ else
   domain_argument=""
 fi
 
+use_declarative_healthcheck=${USE_DECLARATIVE_HEALTHCHECK:-false}
+
 pushd "$DIR/.."
   $cf push $app_name --no-start -m 32M -k 64M ${domain_argument} -s ${cf_stack} -b go_buildpack
   app_guid=$($cf app "${app_name}" --guid | tr -d '\n')
@@ -52,6 +54,11 @@ pushd "$DIR/.."
   if [[ -n "${SERVICE_TO_BIND}" ]]; then
     $cf bind-service $app_name ${SERVICE_TO_BIND}
   fi
+
+  if [[ "${USE_DECLARATIVE_HEALTHCHECK}" == "true" ]]; then
+    $cf set-health-check $app_name http
+  fi
+
   $cf start $app_name
   $cf scale $app_name -i $instance_count
 popd
