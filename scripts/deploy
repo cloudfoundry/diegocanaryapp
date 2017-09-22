@@ -35,7 +35,6 @@ cf=${CF_COMMAND:-cf}
 app_name=${APP_NAME:-diego-canary-app}
 instance_count=${INSTANCE_COUNT:-20}
 domain_name=${DOMAIN:-}
-cf_stack=${CF_STACK:-cflinuxfs2}
 if [[ -n "${domain_name}" ]]; then
   domain_argument="-d ${domain_name}"
 else
@@ -43,7 +42,7 @@ else
 fi
 
 pushd "$DIR/.."
-  $cf push $app_name --no-start -m 32M -k 64M ${domain_argument} -s ${cf_stack} -b go_buildpack
+  $cf push $app_name --no-start -m 32M -k 64M ${domain_argument} -b go_buildpack
   $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
   $cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
   if [[ -n "${SERVICE_TO_BIND}" ]]; then
