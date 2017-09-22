@@ -19,8 +19,7 @@ func main() {
 
 	datadogApiKey := os.Getenv("DATADOG_API_KEY")
 	deploymentName := os.Getenv("DEPLOYMENT_NAME")
-	cellIP := os.Getenv("CF_INSTANCE_IP")
-	go postHeartbeat(appIndex, cellIP, datadogApiKey, deploymentName)
+	go postHeartbeat(appIndex, datadogApiKey, deploymentName)
 
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
@@ -39,7 +38,7 @@ func helloFromInstance(index int) http.Handler {
 	})
 }
 
-func postHeartbeat(appIndex int, cellIP, datadogApiKey, deploymentName string) {
+func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
 	url := fmt.Sprintf(
 		"https://app.datadoghq.com/api/v1/series?api_key=%s",
 		datadogApiKey,
@@ -54,13 +53,12 @@ func postHeartbeat(appIndex int, cellIP, datadogApiKey, deploymentName string) {
 			`[{`+
 			`"metric":"diego.canary.app.instance",`+
 			`"points":[[%d, 1]],`+
-			`"tags":["deployment:%s", "diego-canary-app:%d", "cell-ip:%s"]`+
+			`"tags":["deployment:%s", "diego-canary-app:%d"]`+
 			`}]`+
 			`}`,
 			time.Now().Unix(),
 			deploymentName,
 			appIndex,
-			cellIP,
 		))
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonString))
 		if err != nil {
