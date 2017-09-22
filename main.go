@@ -2,15 +2,15 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
-	appIndex, err := extractAppIndex(os.Getenv("VCAP_APPLICATION"))
+	appIndex, err := strconv.Atoi(os.Getenv("CF_INSTANCE_INDEX"))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -75,18 +75,4 @@ func postHeartbeat(appIndex int, datadogApiKey string, deploymentName string) {
 
 		println("datadog: " + resp.Status)
 	}
-}
-
-func extractAppIndex(vcapApplicationJson string) (int, error) {
-	type vcapApplication struct {
-		InstanceIndex int `json:"instance_index"`
-	}
-
-	var v vcapApplication
-	err := json.Unmarshal([]byte(vcapApplicationJson), &v)
-	if err != nil {
-		return 0, err
-	}
-
-	return v.InstanceIndex, nil
 }
