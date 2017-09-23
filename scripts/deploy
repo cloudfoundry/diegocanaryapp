@@ -15,6 +15,7 @@ set -e -x
 # - APP_NAME (default: diego-canary-app)
 # - INSTANCE_COUNT (default: 20)
 # - DOMAIN (defaults to the default domain for the targeted space)
+# - INCLUDE_CELL_IP_TAG (default: false)
 # - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
 # - CF_STACK (default: cflinuxfs2)
 # - SERVICE_TO_BIND (no default; if specified, binds the given service before cf start)
@@ -45,6 +46,7 @@ pushd "$DIR/.."
   $cf push $app_name --no-start -m 32M -k 64M ${domain_argument} -b go_buildpack
   $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
   $cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
+  $cf set-env $app_name INCLUDE_CELL_IP_TAG ${INCLUDE_CELL_IP_TAG:-false}
   if [[ -n "${SERVICE_TO_BIND}" ]]; then
     $cf bind-service $app_name ${SERVICE_TO_BIND}
   fi
