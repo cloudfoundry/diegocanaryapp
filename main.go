@@ -84,24 +84,25 @@ func postHeartbeat(appIndex int, cellIP, datadogApiKey, deploymentName string) {
 		}
 		jsonPayload, err := json.Marshal(series)
 		if err != nil {
-			println(err.Error())
+			fmt.Fprintf(os.Stderr, err.Error())
 			continue
 		}
 		fmt.Println(string(jsonPayload))
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
 		if err != nil {
-			println(err.Error())
+			fmt.Fprintf(os.Stderr, err.Error())
+			continue
 		}
 
 		req.Header.Set("Content-type", "application/json")
 		resp, err := client.Do(req)
 		if err != nil {
-			println(err.Error())
+			fmt.Fprintf(os.Stderr, err.Error())
 			continue
 		}
 		resp.Body.Close()
 
-		println("datadog: " + resp.Status)
+		fmt.Println("Datadog status: " + resp.Status)
 	}
 }
