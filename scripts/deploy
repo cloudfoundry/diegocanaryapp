@@ -17,7 +17,6 @@ set -e -x
 # - DOMAIN (defaults to the default domain for the targeted space)
 # - INCLUDE_CELL_IP_TAG (default: false)
 # - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
-# - CF_STACK (default: cflinuxfs2)
 # - SERVICE_TO_BIND (no default; if specified, binds the given service before cf start)
 
 if [[ -z "${DATADOG_API_KEY}" ]]; then
