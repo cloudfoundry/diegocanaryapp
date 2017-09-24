@@ -20,13 +20,11 @@ func main() {
 
 	datadogApiKey := os.Getenv("DATADOG_API_KEY")
 	deploymentName := os.Getenv("DEPLOYMENT_NAME")
+	cellIP := os.Getenv("CF_INSTANCE_IP")
 
-	cellIP := ""
-	if os.Getenv("INCLUDE_CELL_IP_TAG") == "true" {
-		cellIP = os.Getenv("CF_INSTANCE_IP")
-	}
+	includeCellIPTag := (os.Getenv("INCLUDE_CELL_IP_TAG") == "true")
 
-	go postHeartbeat(appIndex, cellIP, datadogApiKey, deploymentName)
+	go postHeartbeat(appIndex, datadogApiKey, deploymentName, cellIP, includeCellIPTag)
 
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
@@ -57,7 +55,7 @@ type DatadogMetric struct {
 
 type Point [2]int
 
-func postHeartbeat(appIndex int, cellIP, datadogApiKey, deploymentName string) {
+func postHeartbeat(appIndex int, datadogApiKey, deploymentName, cellIP string, includeCellIPTag bool) {
 	url := "https://app.datadoghq.com/api/v1/series?api_key=" + datadogApiKey
 
 	client := http.DefaultClient
@@ -65,12 +63,14 @@ func postHeartbeat(appIndex int, cellIP, datadogApiKey, deploymentName string) {
 		"deployment:" + deploymentName,
 		fmt.Sprintf("diego-canary-app:%d", appIndex),
 	}
-	if cellIP != "" {
+	if includeCellIPTag {
 		tags = append(tags, "cell-ip:"+cellIP)
 	}
 
 	for {
 		time.Sleep(5 * time.Second)
+
+		fmt.Printf("instance '%d' in deployment '%s' emitting from host IP '%s'\n", appIndex, deploymentName, cellIP)
 
 		series := DatadogSeries{
 			Series: []DatadogMetric{{
@@ -87,7 +87,6 @@ func postHeartbeat(appIndex int, cellIP, datadogApiKey, deploymentName string) {
 			fmt.Fprintf(os.Stderr, err.Error())
 			continue
 		}
-		fmt.Println(string(jsonPayload))
 
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
 		if err != nil {
