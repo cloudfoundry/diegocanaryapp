@@ -10,13 +10,13 @@ import (
 	"time"
 )
 
+const defaultEmissionInterval = 30 * time.Second
+
 func main() {
 	appIndex, err := strconv.Atoi(os.Getenv("CF_INSTANCE_INDEX"))
 	if err != nil {
 		panic(err.Error())
 	}
-
-	http.Handle("/", helloFromInstance(appIndex))
 
 	datadogApiKey := os.Getenv("DATADOG_API_KEY")
 	deploymentName := os.Getenv("DEPLOYMENT_NAME")
@@ -24,7 +24,11 @@ func main() {
 
 	includeCellIPTag := (os.Getenv("INCLUDE_CELL_IP_TAG") == "true")
 
-	go postHeartbeat(appIndex, datadogApiKey, deploymentName, cellIP, includeCellIPTag)
+	emissionInterval := constructEmissionInterval(os.Getenv("EMISSION_INTERVAL"))
+
+	go postHeartbeat(appIndex, datadogApiKey, deploymentName, cellIP, includeCellIPTag, emissionInterval)
+
+	http.Handle("/", helloFromInstance(appIndex))
 
 	err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
@@ -53,7 +57,7 @@ type DatadogMetric struct {
 
 type Point [2]int
 
-func postHeartbeat(appIndex int, datadogApiKey, deploymentName, cellIP string, includeCellIPTag bool) {
+func postHeartbeat(appIndex int, datadogApiKey, deploymentName, cellIP string, includeCellIPTag bool, emissionInterval time.Duration) {
 	url := "https://app.datadoghq.com/api/v1/series?api_key=" + datadogApiKey
 
 	client := http.DefaultClient
@@ -66,7 +70,7 @@ func postHeartbeat(appIndex int, datadogApiKey, deploymentName, cellIP string, i
 	}
 
 	for {
-		time.Sleep(5 * time.Second)
+		time.Sleep(emissionInterval)
 
 		fmt.Printf("instance '%d' in deployment '%s' emitting from host IP '%s'\n", appIndex, deploymentName, cellIP)
 
@@ -102,4 +106,20 @@ func postHeartbeat(appIndex int, datadogApiKey, deploymentName, cellIP string, i
 
 		fmt.Println("Datadog status: " + resp.Status)
 	}
+}
+
+func constructEmissionInterval(intervalText string) time.Duration {
+	if intervalText == "" {
+		fmt.Printf("Using default emission interval of '%s'\n", defaultEmissionInterval.String())
+		return defaultEmissionInterval
+	}
+
+	emissionInterval, err := time.ParseDuration(intervalText)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error parsing EMISSION_INTERVAL value '%s': %s\n", intervalText, err.Error())
+		fmt.Fprintf(os.Stderr, "Using default emission interval of '%s'\n", defaultEmissionInterval.String())
+		return defaultEmissionInterval
+	}
+
+	return emissionInterval
 }
