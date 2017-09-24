@@ -30,8 +30,6 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	fmt.Println("listening and heartbeating...")
 }
 
 func helloFromInstance(index int) http.Handler {
