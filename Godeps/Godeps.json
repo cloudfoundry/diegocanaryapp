@@ -1,5 +1,0 @@
-{
-	"ImportPath": "code.cloudfoundry.org/diegocanaryapp",
-	"GoVersion": "go1.8",
-	"Deps": []
-}
