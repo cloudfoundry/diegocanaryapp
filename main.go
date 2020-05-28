@@ -21,7 +21,12 @@ func main() {
 	cellIP := os.Getenv("CF_INSTANCE_IP")
 	includeCellIPTag := (os.Getenv("INCLUDE_CELL_IP_TAG") == "true")
 
-	heartbeat := NewHeartbeat(appIndex, datadogAPIKey, deploymentName, cellIP, includeCellIPTag)
+	skipHeartbeat := false
+	if datadogAPIKey == "" {
+		skipHeartbeat = true
+	}
+
+	heartbeat := NewHeartbeat(appIndex, datadogAPIKey, deploymentName, cellIP, includeCellIPTag, skipHeartbeat)
 
 	emissionInterval := constructEmissionInterval(os.Getenv("EMISSION_INTERVAL"))
 	go postHeartbeat(heartbeat, emissionInterval)

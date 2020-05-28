@@ -12,7 +12,6 @@ Deploy instances of the canary app to your Runtime/Diego cluster:
 
 ```
 # target the CF org and space intended for the app
-export DATADOG_API_KEY='your-api-key'
 export DEPLOYMENT_NAME='cf-your-deployment-diego'
 ./scripts/deploy
 ```
@@ -30,7 +29,9 @@ The `datadog-config` repo has config for a diego board that has a graph for
 number of instances that are up.  Instance number `n` of the app will emit the
 `diego.canary.app.instance` metric with the tags `deployment:$DEPLOYMENT_NAME` 
 and `diego-canary-app:n`.
-
+To enable sending a heartbeat to DataDog, set the following environment
+variable:
+export DATADOG_API_KEY='your-api-key'
 Pingdom
 =======
 

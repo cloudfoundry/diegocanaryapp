@@ -8,7 +8,6 @@ set -e -x
 
 ## Variables
 # Required:
-# - DATADOG_API_KEY
 # - DEPLOYMENT_NAME
 
 # Optional:
@@ -19,11 +18,7 @@ set -e -x
 # - EMISSION_INTERVAL (default: "")
 # - CF_COMMAND (default: cf; use 'echo cf' for a dry run)
 # - SERVICE_TO_BIND (no default; if specified, binds the given service before cf start)
-
-if [[ -z "${DATADOG_API_KEY}" ]]; then
-  echo "Please set the DATADOG_API_KEY environment variable."
-  exit 1
-fi
+# - DATADOG_API_KEY; if not specified the heartbeat is skipped
 
 if [[ -z "${DEPLOYMENT_NAME}" ]]; then
   echo "Please set the DEPLOYMENT_NAME environment variable."
@@ -45,7 +40,7 @@ fi
 pushd "$DIR/.."
   $cf push $app_name --no-start -m 32M -k 64M ${domain_argument} -b go_buildpack
 
-  $cf set-env $app_name DATADOG_API_KEY ${DATADOG_API_KEY}
+  $cf set-env $app_name DATADOG_API_KEY "${DATADOG_API_KEY}"
   $cf set-env $app_name DEPLOYMENT_NAME ${DEPLOYMENT_NAME}
   $cf set-env $app_name INCLUDE_CELL_IP_TAG ${INCLUDE_CELL_IP_TAG:-false}
   $cf set-env $app_name EMISSION_INTERVAL "${EMISSION_INTERVAL}"

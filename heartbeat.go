@@ -18,9 +18,10 @@ type Heartbeat struct {
 	cellIP         string
 	tags           []string
 	client         *http.Client
+	skipHeartbeat  bool
 }
 
-func NewHeartbeat(appIndex int, datadogAPIKey, deploymentName, cellIP string, includeCellIPTag bool) *Heartbeat {
+func NewHeartbeat(appIndex int, datadogAPIKey, deploymentName, cellIP string, includeCellIPTag bool, skipHeartbeat bool) *Heartbeat {
 	tags := []string{
 		"deployment:" + deploymentName,
 		fmt.Sprintf("diego-canary-app:%d", appIndex),
@@ -37,6 +38,7 @@ func NewHeartbeat(appIndex int, datadogAPIKey, deploymentName, cellIP string, in
 		cellIP:         cellIP,
 		tags:           tags,
 		client:         http.DefaultClient,
+		skipHeartbeat:  skipHeartbeat,
 	}
 }
 
@@ -53,6 +55,10 @@ type DatadogMetric struct {
 type Point [2]int
 
 func (h *Heartbeat) Post() {
+	if h.skipHeartbeat {
+		return
+	}
+
 	fmt.Printf("instance '%d' in deployment '%s' emitting from host IP '%s'\n", h.appIndex, h.deploymentName, h.cellIP)
 
 	series := DatadogSeries{
